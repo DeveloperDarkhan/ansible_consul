@@ -2,7 +2,7 @@
 
  - hosts: work_hosts
    become: true
-   ###become_user: "darkhan"
+   gather_facts: true
    vars_files:
      - vars/vars.yml
      - vars/vault.yml
@@ -12,12 +12,14 @@
 
    - name: Check is service is running
      command: systemctl status nginx
+     ignore_errors: yes
+     changed_when: false
      register: check_nginx
-
-   -  debug: msg="{{ check_nginx }}"
+     
+   - debug: msg="{{ check_nginx }}"
   
-   - name: Adding the path in the bashrc files
-     lineinfile: dest=~/.bashrc line='export CONSUL_HTTP_ADDR=127.0.0.1:8501' 
+  # - name: Adding the path in the bashrc files
+  #   lineinfile: dest=~/.bashrc line='export CONSUL_HTTP_ADDR=127.0.0.1:8501' 
    
 
    - name: gather all users which start with consul*
@@ -25,10 +27,10 @@
         "cat /etc/passwd | grep 'consul[0-9]*' | cut -d: -f1"
      register: reg_vars
 
-   - debug: msg="{{reg_vars.stdout_lines}}"
-   - debug: msg="{{reg_vars}}"
+  # - debug: msg="{{reg_vars.stdout_lines}}"
+  # - debug: msg="{{reg_vars}}"
  
-   - name: Delete users
+   - name: Delete users if somebody exist above
      user:
        name: "{{item}}"
        state: absent
@@ -38,7 +40,7 @@
      when: reg_vars.stdout != ""  
 
 
-   - name: Delete groups
+   - name: Delete groups if somebody exist above
      group:
        name: "{{item}}"
        state: absent
@@ -91,11 +93,6 @@
        group: consul
        recurse: yes
        mode: 0700
-
- #  - name: Include vars of stuff.yaml into the 'stuff' variable (2.2).
- #    include_vars:
- #      file: group_vars/vars
- #      name: stuff
 
    - name: Copy config templates to hosts
      template:

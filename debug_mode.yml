@@ -1,0 +1,61 @@
+---
+
+ - hosts: work_hosts
+   become: true
+   
+   tasks:
+   
+   - name: Debug mode start
+     command: ls /shome/darkhan/
+     register: result
+     failed_when:
+       - '"No suchs file" in result.stderr'
+
+
+   - debug: msg="{{result}}"
+
+
+   - name: check prev result
+     ignore_errors: yes
+     fail:
+       msg: "the command fail"
+     when: "'No such' in result.stderr"
+
+
+   - name: Check if concrete service is running
+     command: systemctl status nginx
+     register: nginx_service
+     ignore_errors: yes
+     failed_when:
+       - nginx_service.rc == 0
+       - "'Active: active' in nginx_service.stdout"
+
+   - debug: msg="{{nginx_service}}"
+
+   - name: check if service is not exist
+     command: systemctl status apache2
+     register: apache2_result
+     ignore_errors: yes     
+     changed_when: false
+     failed_when: '"not be found" in apache2_result.stderr'
+
+   - debug: msg="{{apache2_result}}"
+
+
+   - name: stop service if it exist
+     systemd:
+       state: stopped
+       name: nginx
+     when: 
+       - nginx_service.rc == 0
+       - "'Active: active' in nginx_service.stdout"
+
+
+
+   - name: install nginx
+     yum:
+       name: nginx
+       state: latest
+     environment:
+       CONSUL_HTTP_ADDR: 127.0.0.1:8501
+
