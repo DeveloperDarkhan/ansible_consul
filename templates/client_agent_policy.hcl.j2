@@ -1,0 +1,6 @@
+acl {
+	enabled = true
+	default_policy = "deny"
+	down_policy = "extend-cache"
+	tokens {"agent" = "cf6547f1-4427-2aad-b4d8-e9773901607b", "agent2": = "{{ vault_client_agent_token }}"}
+    }

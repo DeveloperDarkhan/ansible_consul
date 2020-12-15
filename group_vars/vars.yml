@@ -1,0 +1,5 @@
+---
+
+# sensitive data
+client_agent_token: "{{ vault_client_agent_token }}"
+

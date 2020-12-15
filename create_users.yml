@@ -2,6 +2,10 @@
 
  - hosts: work_hosts
    become: true
+   vars_files:
+     - vars/vars.yml
+     - vars/vault.yml
+
    tasks:
    
    - name: gather all users which start with consul*
@@ -76,10 +80,25 @@
        recurse: yes
        mode: 0700
 
+ #  - name: Include vars of stuff.yaml into the 'stuff' variable (2.2).
+ #    include_vars:
+ #      file: group_vars/vars
+ #      name: stuff
+
    - name: Copy config templates to hosts
      template:
        src: templates/{{item.name}}.j2
        dest: "{{item.path}}{{item.name}}"
      with_items:
        - {name: client_config.json, path: "/data/consul/etc/"}
+       - {name: client_agent_policy.hcl, path: "/data/consul/etc/"}
        - {name: consul.service, path: "/etc/systemd/system/"}
+
+
+#   - name: Restart and enable consul
+#     systemd:
+#       state: restarted
+#       enabled: yes
+#       daemon_reload: yes
+#       name: consul
+

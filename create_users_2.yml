@@ -1,0 +1,49 @@
+---
+
+ - hosts: work_hosts
+   become: true
+   vars_files:
+     - vars/vars.yml
+     - vars/vault.yml
+
+   tasks:
+
+     - debug: msg="{{ client_agent_token }}"  
+
+#     - name: gather all users which start with consul*
+#       shell:
+#        "cat /etc/passwd | grep 'consul[0-9]*' | cut -d: -f1"
+#       register: reg_vars
+  # vars_files:
+  #   - [ "vars/vars.yml", "vars/vault.yml" ]
+#     - debug: msg="{{ client_agent_token }}"
+#     - debug: msg="{{reg_vars.stdout_lines}}"
+#     - debug: msg="{{reg_vars}}"
+ 
+ #    copy:
+  #     src: "consul_1.9.0_linux_amd64.zip"
+   #    dest: "/data/consul/"
+    #   mode: 0700
+     #  owner: consul
+      # group: consul
+
+  # - name: Unarchive a file that is already on the remote machine
+   #  unarchive:
+    #   src: /data/consul/consul_1.9.0_linux_amd64.zip
+     #  dest: /data/consul/
+      # remote_src: yes
+
+  # - name: Delete zip file in a remote server
+  #   file:
+  #     path: /data/consul/consul_1.9.0_linux_amd64.zip
+  #     state: absent
+
+
+
+#   - name: Restart and enable consul
+#     systemd:
+#       state: restarted
+#       enabled: yes
+#       daemon_reload: yes
+#       name: consul
+
