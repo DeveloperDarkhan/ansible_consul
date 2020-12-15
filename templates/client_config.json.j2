@@ -6,11 +6,14 @@
     "datacenter": "jysanbank",
     "data_dir": "/data/consul/data",
     "pid_file": "/data/consul/consul.pid",
-    "encrypt": "qp7OjzAlUL7DNaVELXzOiB39BUD5TAHAnsawUl72v68=",
+    "encrypt": "{{ all_servers_encrypt_key }}",
     "log_level": "INFO",
     "enable_syslog": true,
     "leave_on_terminate": true,
     "start_join": [ {% for item in groups['server_hosts'] %} 
         "{{ item }}"{% if not loop.last %},{% endif %}
-    {% endfor %}]
+    {% endfor %}],
+    "ports" : {"http": 8501},
+    "enable_local_scripts_checks": true,
+    "telemetry": { "disable_compat_1.9": false}
 }

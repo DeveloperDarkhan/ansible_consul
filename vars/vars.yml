@@ -2,4 +2,4 @@
 
 # sensitive data
 client_agent_token: "{{ vault_client_agent_token }}"
-
+all_servers_encrypt_key: "{{ vault_encrypt_field }}"

@@ -2,12 +2,24 @@
 
  - hosts: work_hosts
    become: true
+   ###become_user: "darkhan"
    vars_files:
      - vars/vars.yml
      - vars/vault.yml
 
    tasks:
+ 
+
+   - name: Check is service is running
+     command: systemctl status nginx
+     register: check_nginx
+
+   -  debug: msg="{{ check_nginx }}"
+  
+   - name: Adding the path in the bashrc files
+     lineinfile: dest=~/.bashrc line='export CONSUL_HTTP_ADDR=127.0.0.1:8501' 
    
+
    - name: gather all users which start with consul*
      shell:
         "cat /etc/passwd | grep 'consul[0-9]*' | cut -d: -f1"
@@ -88,11 +100,11 @@
    - name: Copy config templates to hosts
      template:
        src: templates/{{item.name}}.j2
-       dest: "{{item.path}}{{item.name}}"
+       dest: "{{item.path}}"
      with_items:
-       - {name: client_config.json, path: "/data/consul/etc/"}
-       - {name: client_agent_policy.hcl, path: "/data/consul/etc/"}
-       - {name: consul.service, path: "/etc/systemd/system/"}
+       - {name: client_config.json, path: "/data/consul/etc/config.json"}
+       - {name: client_agent_policy.hcl, path: "/data/consul/etc/agent_policy.hcl"}
+       - {name: consul.service, path: "/etc/systemd/system/consul.service"}
 
 
 #   - name: Restart and enable consul
