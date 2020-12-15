@@ -1,0 +1,31 @@
+---
+
+ - hosts: work_hosts
+   become: true
+   tasks:
+   
+   - name: gather all users which start with consul*
+     shell:
+        "cat /etc/passwd | grep 'consul[0-9]*' | cut -d: -f1"
+     register: reg_vars
+
+   - debug: msg="{{reg_vars.stdout_lines}}"
+   - debug: msg="{{reg_vars}}"
+ 
+   - name: Delete users
+     user:
+       name: "{{item}}"
+       state: absent
+       remove: yes
+     with_items:
+       - "{{reg_vars.stdout_lines}}"
+     when: reg_vars.stdout != ""  
+
+
+   - name: Delete groups
+     group:
+       name: "{{item}}"
+       state: absent
+     with_items:
+       - "{{reg_vars.stdout_lines}}"
+     when: reg_vars.stdout != ""
